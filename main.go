@@ -1,7 +1,9 @@
 package main
 
 import (
+	"fmt"
 	"log"
+	"os"
 
 	"golang.org/x/sys/windows/svc"
 	"golang.org/x/sys/windows/svc/debug"
@@ -22,7 +24,9 @@ func main() {
 	serviceLog = elog
 
 	if err := runService(); err != nil {
-		log.Fatalf("Service error: %v", err)
+		msg := fmt.Sprintf("Service start error: %v", err)
+		serviceLog.Error(1, msg)
+		os.Exit(1)
 	}
 }
 

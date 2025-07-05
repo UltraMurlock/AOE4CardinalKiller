@@ -15,7 +15,7 @@ func (m *KillerService) Execute(args []string, r <-chan svc.ChangeRequest, chang
 
 	serviceLog.Info(1, "Service started")
 
-	var ticker time.Ticker = *time.NewTicker(1 * time.Second)
+	var ticker *time.Ticker = time.NewTicker(1 * time.Second)
 	defer ticker.Stop()
 
 	var isMainStarted bool = false
@@ -54,5 +54,7 @@ mainLoop:
 	}
 
 	changes <- svc.Status{State: svc.State(svc.StopPending)}
+	changes <- svc.Status{State: svc.Stopped}
+	serviceLog.Info(1, "Service stopped")
 	return
 }
