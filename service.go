@@ -15,7 +15,10 @@ func (m *KillerService) Execute(args []string, r <-chan svc.ChangeRequest, chang
 
 	serviceLog.Info(1, "Service started")
 
-	var ticker *time.Ticker = time.NewTicker(1 * time.Second)
+	const gameInactiveUpdatePeriod time.Duration = 30 * time.Second
+	const gameActiveUpdatePeriod time.Duration = 1 * time.Second
+
+	var ticker *time.Ticker = time.NewTicker(gameInactiveUpdatePeriod)
 	defer ticker.Stop()
 
 	var isMainStarted bool = false
@@ -28,6 +31,8 @@ mainLoop:
 			if !isMainStarted && len(processes) != 0 && processes[0].ThreadCount >= 60 {
 				serviceLog.Info(1, "Game started")
 				isMainStarted = true
+
+				ticker.Reset(gameActiveUpdatePeriod)
 				continue
 			}
 
@@ -41,6 +46,8 @@ mainLoop:
 				} else {
 					serviceLog.Info(1, "Process terminated successfully")
 				}
+
+				ticker.Reset(gameInactiveUpdatePeriod)
 			}
 
 		case c := <-r:
